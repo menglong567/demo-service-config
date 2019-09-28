@@ -1,0 +1,32 @@
+# 服务名称
+spring:
+  application:
+    name: demo-service
+  datasource:
+    username: root
+    password: root
+    url: jdbc:mysql://localhost:3306/demo_service_db
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create
+
+
+# 服务端口号
+server:
+  port: 10000
+  servlet:
+    context-path: /
+
+#Eureka 相关配置
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/,http://localhost:8762/eureka/
+    fetch-registry: true
+    register-with-eureka: true
+  instance:
+    appname: ${spring.application.name}
+    ip-address:
+    prefer-ip-address: false
+
