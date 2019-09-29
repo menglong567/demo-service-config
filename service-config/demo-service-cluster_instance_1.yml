@@ -14,7 +14,7 @@ spring:
 
 # 服务端口号
 server:
-  port: 10000
+  port: 8080
   servlet:
     context-path: /
 
@@ -29,4 +29,3 @@ eureka:
     appname: ${spring.application.name}
     ip-address:
     prefer-ip-address: false
-
