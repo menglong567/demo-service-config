@@ -1,0 +1,272 @@
+version: '3'
+services:
+
+#  mysql-5.7:
+#    image: mysql/mysql-server:5.7
+#    container_name: mysql-5.7
+#    volumes:
+#      - /disk-2/data/mysql-data:/var/lib/mysql
+#    ports:
+#      - 33060:33060
+#    networks:
+#      extnetwork:
+#        ipv4_address: 172.19.0.10
+#    ulimits:
+#      nproc: 65535
+#      nofile:
+#        soft: 20000
+#        hard: 40000
+
+  eureka-server-instance-1:
+    image: menglong567:eureka-server-img
+    volumes:
+      - /disk-2/data/docker_instances_log_store/eureka-server/cluster_instance_1:/logs
+    container_name: eureka-server-instance-1
+    #network_mode:
+    networks:
+      extnetwork:
+        ipv4_address: 172.19.0.2
+    ports:
+      - 8761:8761
+    environment:
+      - SPRING_PROFILES_ACTIVE=cluster_instance_1
+      - EUREKA_CLIENT_SERVICE-URL_DEFAULTZONE=http://server2:8762/eureka/
+      - SERVER_PORT=8761
+    external_links:
+      - mysql
+    extra_hosts:
+      - "server1:172.19.0.2"
+      - "server2:172.19.0.3"
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 20000
+        hard: 40000
+
+  eureka-server-instance-2:
+    image: menglong567:eureka-server-img
+    volumes:
+      - /disk-2/data/docker_instances_log_store/eureka-server/cluster_instance_2:/logs
+    container_name: eureka-server-instance-2
+    #network_mode:
+    networks:
+      extnetwork:
+        ipv4_address: 172.19.0.3
+    ports:
+      - 8762:8762
+    environment:
+      - SPRING_PROFILES_ACTIVE=cluster_instance_2
+      - EUREKA_CLIENT_SERVICE-URL_DEFAULTZONE=http://server1:8761/eureka/
+      - SERVER_PORT=8762
+    external_links:
+      - mysql
+    extra_hosts:
+      - "server1:172.19.0.2"
+      - "server2:172.19.0.3"
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 20000
+        hard: 40000
+
+  config-server-instance-1:
+    image: menglong567:config-server-img
+    volumes:
+      - /disk-2/data/docker_instances_log_store/config-server/cluster_instance_1:/logs
+    depends_on:
+      - eureka-server-instance-1
+      - eureka-server-instance-2
+    container_name: config-server-instance-1
+    #network_mode:
+    networks:
+      extnetwork:
+        ipv4_address: 172.19.0.4
+    ports:
+      - 19001:19001
+    environment:
+      - SPRING_PROFILES_ACTIVE=cluster_instance_1
+      - EUREKA_CLIENT_SERVICE-URL_DEFAULTZONE=http://server1:8761/eureka/,http://server2:8762/eureka/
+      - SERVER_PORT=19001
+    external_links:
+      - mysql
+    extra_hosts:
+      - "server1:172.19.0.2"
+      - "server2:172.19.0.3"
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 20000
+        hard: 40000
+
+  config-server-instance-2:
+    image: menglong567:config-server-img
+    volumes:
+      - /disk-2/data/docker_instances_log_store/config-server/cluster_instance_2:/logs
+    depends_on:
+      - eureka-server-instance-1
+      - eureka-server-instance-2
+    container_name: config-server-instance-2
+    #network_mode:
+    networks:
+      extnetwork:
+        ipv4_address: 172.19.0.5
+    ports:
+      - 19002:19002
+    environment:
+      - SPRING_PROFILES_ACTIVE=cluster_instance_2
+      - EUREKA_CLIENT_SERVICE-URL_DEFAULTZONE=http://server1:8761/eureka/,http://server2:8762/eureka/
+      - SERVER_PORT=19002
+    external_links:
+      - mysql
+    extra_hosts:
+      - "server1:172.19.0.2"
+      - "server2:172.19.0.3"
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 20000
+        hard: 40000
+
+
+  gateway-server-instance-1:
+    image: menglong567:gateway-server-img
+    volumes:
+      - /disk-2/data/docker_instances_log_store/gateway-server/cluster_instance_1:/logs
+    depends_on:
+      - eureka-server-instance-1
+      - eureka-server-instance-2
+    container_name: gateway-server-instance-1
+    #network_mode:
+    networks:
+      extnetwork:
+        ipv4_address: 172.19.0.6
+    ports:
+      - 7070:7070
+    environment:
+      - SPRING_PROFILES_ACTIVE=cluster_instance_1
+      - EUREKA_CLIENT_SERVICE-URL_DEFAULTZONE=http://server1:8761/eureka/,http://server2:8762/eureka/
+      - SERVER_PORT=7070
+    external_links:
+      - mysql
+    extra_hosts:
+      - "server1:172.19.0.2"
+      - "server2:172.19.0.3"
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 20000
+        hard: 40000
+
+  gateway-server-instance-2:
+    image: menglong567:gateway-server-img
+    volumes:
+      - /disk-2/data/docker_instances_log_store/gateway-server/cluster_instance_2:/logs
+    depends_on:
+      - eureka-server-instance-1
+      - eureka-server-instance-2
+    container_name: gateway-server-instance-2
+    #network_mode:
+    networks:
+      extnetwork:
+        ipv4_address: 172.19.0.7
+    ports:
+      - 8080:8080
+    environment:
+      - SPRING_PROFILES_ACTIVE=cluster_instance_2
+      - EUREKA_CLIENT_SERVICE-URL_DEFAULTZONE=http://server1:8761/eureka/,http://server2:8762/eureka/
+      - SERVER_PORT=8080
+    external_links:
+      - mysql
+    extra_hosts:
+      - "server1:172.19.0.2"
+      - "server2:172.19.0.3"
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 20000
+        hard: 40000
+
+  demo-server-instance-1:
+    image: menglong567:demo-server-img
+    volumes:
+      - /disk-2/data/docker_instances_log_store/demo-server/cluster_instance_1:/logs
+    depends_on:
+      - eureka-server-instance-1
+      - eureka-server-instance-2
+      - config-server-instance-1
+      - config-server-instance-2
+    container_name: demo-server-instance-1
+    #network_mode:
+    networks:
+      extnetwork:
+        ipv4_address: 172.19.0.8
+    ports:
+      - 7777:7777
+    environment:
+      - SPRING_PROFILES_ACTIVE=cluster_instance_1
+      - EUREKA_CLIENT_SERVICE-URL_DEFAULTZONE=http://server1:8761/eureka/,http://server2:8762/eureka/
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - SPRING_DATASOURCE_URL=jdbc:mysql://172.19.0.10:3306/demo_service_db
+      - SPRING_DATASOURCE_TOMCAT_TEST-ON-BORROW=true
+      - SPRING_DATASOURCE_TOMCAT_TEST-ON-CONNECT=true
+      - SPRING_DATASOURCE_TOMCAT_MAX-ACTIVE=20
+      - SPRING_DATASOURCE_TOMCAT_MAX-WAIT=10000
+      - SERVER_PORT=7777
+    external_links:
+      - mysql
+    extra_hosts:
+      - "server1:172.19.0.2"
+      - "server2:172.19.0.3"
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 20000
+        hard: 40000
+
+  demo-server-instance-2:
+    image: menglong567:demo-server-img
+    volumes:
+      - /disk-2/data/docker_instances_log_store/demo-server/cluster_instance_2:/logs
+    depends_on:
+      - eureka-server-instance-1
+      - eureka-server-instance-2
+      - config-server-instance-1
+      - config-server-instance-2
+    container_name: demo-server-instance-2
+    #network_mode:
+    networks:
+      extnetwork:
+        ipv4_address: 172.19.0.9
+    ports:
+      - 8888:8888
+    environment:
+      - SPRING_PROFILES_ACTIVE=cluster_instance_2
+      - EUREKA_CLIENT_SERVICE-URL_DEFAULTZONE=http://server1:8761/eureka/,http://server2:8762/eureka/
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - SPRING_DATASOURCE_URL=jdbc:mysql://172.19.0.10:3306/demo_service_db
+      - SPRING_DATASOURCE_TOMCAT_TEST-ON-BORROW=true
+      - SPRING_DATASOURCE_TOMCAT_TEST-ON-CONNECT=true
+      - SPRING_DATASOURCE_TOMCAT_MAX-ACTIVE=20
+      - SPRING_DATASOURCE_TOMCAT_MAX-WAIT=10000
+      - SERVER_PORT=8888
+    external_links:
+      - mysql
+    extra_hosts:
+      - "server1:172.19.0.2"
+      - "server2:172.19.0.3"
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 20000
+        hard: 40000
+
+networks:
+  extnetwork:
+    driver: bridge
+    internal: false
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.19.0.0/16

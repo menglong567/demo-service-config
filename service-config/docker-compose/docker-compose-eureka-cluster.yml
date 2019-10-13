@@ -1,0 +1,63 @@
+version: '3'
+services:
+
+  eureka-server-instance-1:
+    image: menglong567:eureka-server-img
+    volumes:
+      - /disk-2/data/docker_instances_log_store/eureka-server/cluster_instance_1:/logs
+    container_name: eureka-server-instance-1
+    #network_mode:
+    networks:
+      extnetwork:
+        ipv4_address: 172.19.0.2
+    ports:
+      - 8761:8761
+    environment:
+      - SPRING_PROFILES_ACTIVE=cluster_instance_1
+      - EUREKA_CLIENT_SERVICE-URL_DEFAULTZONE=http://server2:8762/eureka/
+      - SERVER_PORT=8761
+    external_links:
+      - mysql
+    extra_hosts:
+      - "server1:172.19.0.2"
+      - "server2:172.19.0.3"
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 20000
+        hard: 40000
+
+  eureka-server-instance-2:
+    image: menglong567:eureka-server-img
+    volumes:
+      - /disk-2/data/docker_instances_log_store/eureka-server/cluster_instance_2:/logs
+    container_name: eureka-server-instance-2
+    #network_mode:
+    networks:
+      extnetwork:
+        ipv4_address: 172.19.0.3
+    ports:
+      - 8762:8762
+    environment:
+      - SPRING_PROFILES_ACTIVE=cluster_instance_2
+      - EUREKA_CLIENT_SERVICE-URL_DEFAULTZONE=http://server1:8761/eureka/
+      - SERVER_PORT=8762
+    external_links:
+      - mysql
+    extra_hosts:
+      - "server1:172.19.0.2"
+      - "server2:172.19.0.3"
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 20000
+        hard: 40000
+
+networks:
+  extnetwork:
+    driver: bridge
+    internal: false
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.19.0.0/16
