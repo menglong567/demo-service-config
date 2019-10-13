@@ -1,22 +1,6 @@
 version: '3'
 services:
 
-#  mysql-5.7:
-#    image: mysql/mysql-server:5.7
-#    container_name: mysql-5.7
-#    volumes:
-#      - /disk-2/data/mysql-data:/var/lib/mysql
-#    ports:
-#      - 33060:33060
-#    networks:
-#      extnetwork:
-#        ipv4_address: 172.19.0.10
-#    ulimits:
-#      nproc: 65535
-#      nofile:
-#        soft: 20000
-#        hard: 40000
-
   eureka-server-instance-1:
     image: menglong567:eureka-server-img
     volumes:
