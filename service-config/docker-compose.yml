@@ -5,6 +5,7 @@ services:
     image: menglong567:eureka-server-img
     volumes:
       - /disk-2/data/docker_instances_log_store/eureka-server/cluster_instance_1:/logs
+    entrypoint: ["java","-Djava.security.egd=file:/dev/./urandom","-Xmx512m","-jar","/app.jar"]
     container_name: eureka-server-instance-1
     #network_mode:
     networks:
@@ -18,6 +19,7 @@ services:
       - SERVER_PORT=8761
     external_links:
       - mysql
+    hostname: server1
     extra_hosts:
       - "server1:172.19.0.2"
       - "server2:172.19.0.3"
@@ -31,6 +33,7 @@ services:
     image: menglong567:eureka-server-img
     volumes:
       - /disk-2/data/docker_instances_log_store/eureka-server/cluster_instance_2:/logs
+    entrypoint: ["java","-Djava.security.egd=file:/dev/./urandom","-Xmx512m","-jar","/app.jar"]
     container_name: eureka-server-instance-2
     #network_mode:
     networks:
@@ -44,6 +47,7 @@ services:
       - SERVER_PORT=8762
     external_links:
       - mysql
+    hostname: server2
     extra_hosts:
       - "server1:172.19.0.2"
       - "server2:172.19.0.3"
@@ -60,6 +64,7 @@ services:
     depends_on:
       - eureka-server-instance-1
       - eureka-server-instance-2
+    entrypoint: ["java","-Djava.security.egd=file:/dev/./urandom","-Xmx512m","-jar","/app.jar"]
     container_name: config-server-instance-1
     #network_mode:
     networks:
@@ -89,6 +94,7 @@ services:
     depends_on:
       - eureka-server-instance-1
       - eureka-server-instance-2
+    entrypoint: ["java","-Djava.security.egd=file:/dev/./urandom","-Xmx512m","-jar","/app.jar"]
     container_name: config-server-instance-2
     #network_mode:
     networks:
@@ -119,6 +125,7 @@ services:
     depends_on:
       - eureka-server-instance-1
       - eureka-server-instance-2
+    entrypoint: ["java","-Djava.security.egd=file:/dev/./urandom","-Xmx512m","-jar","/app.jar"]
     container_name: gateway-server-instance-1
     #network_mode:
     networks:
@@ -148,6 +155,7 @@ services:
     depends_on:
       - eureka-server-instance-1
       - eureka-server-instance-2
+    entrypoint: ["java","-Djava.security.egd=file:/dev/./urandom","-Xmx512m","-jar","/app.jar"]
     container_name: gateway-server-instance-2
     #network_mode:
     networks:
@@ -179,6 +187,7 @@ services:
       - eureka-server-instance-2
       - config-server-instance-1
       - config-server-instance-2
+    entrypoint: ["java","-Djava.security.egd=file:/dev/./urandom","-Xmx512m","-jar","/app.jar"]
     container_name: demo-server-instance-1
     #network_mode:
     networks:
@@ -217,6 +226,8 @@ services:
       - eureka-server-instance-2
       - config-server-instance-1
       - config-server-instance-2
+    #entrypoint: ["java","-Djava.security.egd=file:/dev/./urandom","-Xmx512m","-jar","/app.jar"]
+    entrypoint: ["java","-Djava.security.egd=file:/dev/./urandom","-Xmx512m","-verbose:gc","-jar","/app.jar"]
     container_name: demo-server-instance-2
     #network_mode:
     networks:
